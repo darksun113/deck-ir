@@ -17,3 +17,6 @@ export {
 export { parsePptxToRawIR } from './raw/parse-pptx';
 export { transformToSemanticIR } from './semantic/transform';
 export { buildLineages, type SlideLineage } from './semantic/lineage';
+export { parsePptx } from './parse-pptx-api';
+export type { ParseOptions, ParsedDeck } from './api-types';
+export { emitSlideHtml } from './emit/slide-html';
