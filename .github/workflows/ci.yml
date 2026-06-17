@@ -11,12 +11,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Install pnpm directly (version from the package.json "packageManager" field)
+      # instead of `corepack enable`, which fails on CI runners due to corepack's
+      # signature-download bug.
+      - uses: pnpm/action-setup@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-
-      - name: Enable corepack
-        run: corepack enable
+          cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile

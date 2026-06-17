@@ -4,6 +4,7 @@
   "description": "Faithfully render PowerPoint .pptx into HTML in pure JS — no PowerPoint, no headless browser.",
   "license": "AGPL-3.0-only",
   "type": "module",
+  "packageManager": "pnpm@9.6.0",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
