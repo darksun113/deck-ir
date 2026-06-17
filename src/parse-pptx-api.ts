@@ -6,13 +6,20 @@
 // Orchestrates raw → semantic → emit, and resolves each picture's embedId
 // (rId) + owner (kind/id) to a physical media file, emitting a data: URL by
 // default (or the user-supplied mediaResolver).
+//
+// parsePptxToSemantic(...) exposes the same raw→semantic+media core WITHOUT the
+// final HTML emit, for downstream consumers (deck-ir-vlm) that emit their own
+// HTML over the SemanticSlide objects + the shared resolveMedia closure.
 
 import type { ParserContext } from './index';
+import type { SemanticSlide } from './ir/semantic';
+import type { ResolveMedia } from './emit/element-html';
+import type { CollectorLogger } from './logger';
 import { parsePptxToRawIR } from './raw/parse-pptx';
 import { transformToSemanticIR } from './semantic/transform';
 import { emitSlideHtml } from './emit/slide-html';
 import { createCollectorLogger, composeLoggers, createNoopLogger } from './logger';
-import type { ParseOptions, ParsedDeck } from './api-types';
+import type { ParseOptions, ParsedDeck, SemanticParse } from './api-types';
 
 /** internalPath / file extension → MIME type (mirrors raw collectFromLayer, plus emf/wmf/bmp/webp). */
 function mimeFromPath(path: string): string {
@@ -50,10 +57,16 @@ function compositeKey(ownerKind: string, ownerId: string, embedId: string): stri
   return `${ownerKind}::${ownerId}::${embedId}`;
 }
 
-export async function parsePptx(
+/** Shared raw→semantic+media core for both public entry points (no HTML emit). */
+interface SemanticCore extends SemanticParse {
+  /** Collector exposed so parsePptx can bucket per-slide warnings; internal only. */
+  collector: CollectorLogger;
+}
+
+async function parseToSemanticCore(
   buffer: Uint8Array | ArrayBuffer,
-  options: ParseOptions = {},
-): Promise<ParsedDeck> {
+  options: ParseOptions,
+): Promise<SemanticCore> {
   // 1. collector (for bucketing warnings) composed with the user's logger (or noop).
   const collector = createCollectorLogger();
   const userLogger = options.logger;
@@ -96,7 +109,7 @@ export async function parsePptx(
   }
 
   // 5. resolveMedia: (embedId, ownerKind, ownerId) → physical internalPath → src.
-  const resolveMedia = (embedId: string, ownerKind: string, ownerId: string): string => {
+  const resolveMedia: ResolveMedia = (embedId, ownerKind, ownerId) => {
     const internalPath = keyToPath.get(compositeKey(ownerKind, ownerId, embedId));
     if (!internalPath) {
       logger.warn({
@@ -120,9 +133,19 @@ export async function parsePptx(
     return `data:${entry.mimeType};base64,${base64}`;
   };
 
-  // 6. slides + per-slide warnings (bucketed by collector's slideRef === slide.id).
-  const slides = semantic.slides.map((slide) => {
-    const html = emitSlideHtml(slide, semantic.slideSize, resolveMedia);
+  return { slideSize: semantic.slideSize, slides: semantic.slides, media, resolveMedia, collector };
+}
+
+export async function parsePptx(
+  buffer: Uint8Array | ArrayBuffer,
+  options: ParseOptions = {},
+): Promise<ParsedDeck> {
+  const { slideSize, slides: semanticSlides, media, resolveMedia, collector } =
+    await parseToSemanticCore(buffer, options);
+
+  // slides + per-slide warnings (bucketed by collector's slideRef === slide.id).
+  const slides = semanticSlides.map((slide) => {
+    const html = emitSlideHtml(slide, slideSize, resolveMedia);
     const warnings = collector
       .toEvents()
       .filter(({ event }) => event.context.slideRef === slide.id)
@@ -133,6 +156,19 @@ export async function parsePptx(
     return { html, warnings };
   });
 
-  // 7.
-  return { slideSize: semantic.slideSize, slides, media };
+  return { slideSize, slides, media };
+}
+
+/**
+ * Lower-level entry point: parse to SemanticSlide[] + a ready resolveMedia
+ * closure + the media map, WITHOUT emitting HTML. For downstream layers
+ * (deck-ir-vlm) that render their own HTML — pair with emitSlideHtml or a
+ * custom emitter over the same slides/resolveMedia.
+ */
+export async function parsePptxToSemantic(
+  buffer: Uint8Array | ArrayBuffer,
+  options: ParseOptions = {},
+): Promise<SemanticParse> {
+  const { slideSize, slides, media, resolveMedia } = await parseToSemanticCore(buffer, options);
+  return { slideSize, slides, media, resolveMedia };
 }
