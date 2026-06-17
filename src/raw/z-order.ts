@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2026 Kelvin Gao <mtion@msn.com>
+
 import { XMLParser } from 'fast-xml-parser';
 
 // preserveOrder 解析器: 每个元素节点是 { "<tag>": [children...], ":@"?: { "@_attr": "val" } }

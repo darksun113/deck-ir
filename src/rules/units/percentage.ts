@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2026 Kelvin Gao <mtion@msn.com>
+
 const _META_PCT = {
   decisionId: '#3',
   ruleName: 'ST_Percentage 1/1000% (100000 = 100%)',

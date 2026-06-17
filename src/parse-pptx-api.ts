@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2026 Kelvin Gao <mtion@msn.com>
+
 // src/parse-pptx-api.ts
 // Public one-shot API: parsePptx(buffer, options) → ParsedDeck.
 // Orchestrates raw → semantic → emit, and resolves each picture's embedId

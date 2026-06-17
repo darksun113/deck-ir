@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2026 Kelvin Gao <mtion@msn.com>
+
 import type { RawShape, RawPicture, RawGroupShape, RawGraphicFrame, RawCSld } from '../ir/raw';
 
 type RawSpTreeChild = RawShape | RawPicture | RawGroupShape | RawGraphicFrame;

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2026 Kelvin Gao <mtion@msn.com>
+
 // ============ 基础类型 ============
 export type RawXmlAttrs = Record<string, string | number>;
 

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2026 Kelvin Gao <mtion@msn.com>
+
 // src/emit/slide-html.ts
 // Generic SemanticIR → HTML slide emitter.
 // Wraps a slide's elements in a positioned <section class="slide">, using the

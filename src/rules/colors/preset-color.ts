@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2026 Kelvin Gao <mtion@msn.com>
+
 const _META = {
   decisionId: '#6',
   ruleName: 'prstClr 149 项 SVG 1.1 hex 查表',

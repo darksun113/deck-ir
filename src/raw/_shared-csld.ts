@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2026 Kelvin Gao <mtion@msn.com>
+
 import type { RawCSld, RawBackground, RawFill, RawShape, RawPicture, RawGroupShape, RawGraphicFrame } from '../ir/raw';
 import { parseShape, parseColor, parseConnector } from './element-sp';
 import { parsePicture, type PictureCtx } from './element-pic';

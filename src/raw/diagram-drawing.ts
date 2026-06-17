@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2026 Kelvin Gao <mtion@msn.com>
+
 // 修2: SmartArt(graphicFrame diagram)缓存绘图渲染。
 // OOXML 的 SmartArt 把"已渲染的形状"缓存在 ppt/diagrams/drawingN.xml(dsp:drawing)里。
 // 之前 graphicFrame 一律丢成占位 → 目录/章节页的红灰圆角矩形导航全没。

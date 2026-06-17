@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2026 Kelvin Gao <mtion@msn.com>
+
 import { XMLBuilder, XMLParser } from 'fast-xml-parser';
 import type { RawShape, RawXfrm, RawFill, RawColor, RawOutline, RawStyleRef, RawTextBody, RawParagraph, RawTextRun, RawCustPath } from '../ir/raw';
 import { attr, emuNum, toArray } from './_shared-csld';

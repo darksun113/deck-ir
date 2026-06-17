@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2026 Kelvin Gao <mtion@msn.com>
+
 import { describe, it, expect } from 'vitest';
 import { resolveFillRef } from './fill-ref';
 import type { RawTheme } from '../../ir/raw';

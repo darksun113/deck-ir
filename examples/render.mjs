@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2026 Kelvin Gao <mtion@msn.com>
+
 // 用法 / Usage: node examples/render.mjs <input.pptx> [out.html]
 import { parsePptx } from "../dist/index.js";
 import { readFileSync, writeFileSync } from "node:fs";

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2026 Kelvin Gao <mtion@msn.com>
+
 import { XMLParser } from 'fast-xml-parser';
 import type { RawSlide } from '../ir/raw';
 import type { RuleLogger } from '../logger/types';

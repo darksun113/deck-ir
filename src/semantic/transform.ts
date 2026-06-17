@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2026 Kelvin Gao <mtion@msn.com>
+
 import type { RawIR, RawShape, RawPicture, RawGroupShape, RawGraphicFrame, RawTheme, RawClrMap, RawTextBody } from '../ir/raw';
 import type { SemanticIR, SemanticSlide, SemanticElement, SemanticTextBody, SemanticParagraph, SemanticTextRun } from '../ir/semantic';
 import type { RuleLogger } from '../logger/types';

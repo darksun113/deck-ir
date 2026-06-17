@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2026 Kelvin Gao <mtion@msn.com>
+
 import type { RawTextRun, RawTheme, RawClrMap, RawColor } from '../../ir/raw';
 import { resolveSchemeColor, type ThemeClrScheme } from '../colors/scheme-color';
 import { resolvePresetColor } from '../colors/preset-color';

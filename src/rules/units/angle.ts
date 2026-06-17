@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2026 Kelvin Gao <mtion@msn.com>
+
 const _META_ANGLE = {
   decisionId: '#2',
   ruleName: 'ST_Angle 1/60000° (Microsoft typo 1/64000 已修正)',

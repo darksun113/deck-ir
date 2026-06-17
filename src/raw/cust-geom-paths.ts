@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2026 Kelvin Gao <mtion@msn.com>
+
 // 修#2: custGeom 自定义图形路径解析。路径命令(moveTo/lnTo/cubicBezTo…)交错出现、顺序攸关,
 // fast-xml-parser 默认按 tag 分组会丢顺序 → 用 preserveOrder 单独解析一遍(同 z-order 思路),
 // 按 shape id 提取有序命令。供 element-sp 查表填 raw.geom.custPath,再由 custGeomToSvgPath 转 SVG。
