@@ -23,3 +23,14 @@ export { buildLineages, type SlideLineage } from './semantic/lineage';
 export { parsePptx } from './parse-pptx-api';
 export type { ParseOptions, ParsedDeck } from './api-types';
 export { emitSlideHtml } from './emit/slide-html';
+// Emit building blocks — exported so a downstream editable emitter (deck-ir-vlm)
+// can reuse the exact element styling while swapping text for {{token}} slots.
+export {
+  emitElementHtml,
+  textShapeStyle,
+  provenanceAttrs,
+  escapeHtml,
+  textBodyToInlineHtml,
+  hasRenderableText,
+  type ResolveMedia,
+} from './emit/element-html';
