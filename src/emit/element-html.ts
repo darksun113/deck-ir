@@ -77,8 +77,28 @@ function srcRectToObjectPosition(sr?: {
 }
 
 /** Provenance attrs kept from the source element (harmless, no VLM semantics). */
-function provenanceAttrs(id: string, source: string): string {
+export function provenanceAttrs(id: string, source: string): string {
   return `data-id="${id}" data-source="${source}"`;
+}
+
+/**
+ * Full inline style string for a text shape (base + fill + outline + text styles).
+ * Exported so a downstream editable emitter (e.g. deck-ir-vlm) can reuse the EXACT
+ * styling while swapping the inner text for a `{{token}}` editable slot.
+ */
+export function textShapeStyle(el: Extract<SemanticElement, { kind: 'shape' }>): string {
+  const { bbox, transform } = el;
+  const base = `position:absolute; left:${bbox.x}px; top:${bbox.y}px; width:${bbox.w}px; height:${bbox.h}px;${transform ? ` transform:${transform};` : ''}`;
+  const fill = el.fill?.css ?? '';
+  const outline = el.outline?.css ?? '';
+  const bodyStyle = el.text?.bodyStyle ?? '';
+  const firstPara = el.text?.paragraphs[0];
+  const firstRun =
+    el.text?.paragraphs.flatMap((p) => p.runs).find((r) => r.text.trim().length > 0) ??
+    firstPara?.runs[0];
+  const rStyle = firstRun?.rStyle ?? '';
+  const pStyle = firstPara?.pStyle ?? '';
+  return `${base} ${fill} ${outline} ${bodyStyle} ${pStyle} ${rStyle}`;
 }
 
 export function emitElementHtml(
@@ -97,16 +117,7 @@ export function emitElementHtml(
     // Shape with visible text → div with actual escaped text + run/paragraph styles.
     if (el.text && hasRenderableText(el.text)) {
       const inline = textBodyToInlineHtml(el.text);
-      const bodyStyle = el.text.bodyStyle ?? '';
-      // Representative run rStyle + first paragraph pStyle (already valid CSS, appended directly).
-      const firstPara = el.text.paragraphs[0];
-      const firstRun =
-        el.text.paragraphs
-          .flatMap((p) => p.runs)
-          .find((r) => r.text.trim().length > 0) ?? firstPara?.runs[0];
-      const rStyle = firstRun?.rStyle ?? '';
-      const pStyle = firstPara?.pStyle ?? '';
-      return `<div ${prov} style="${base} ${fill} ${outline} ${bodyStyle} ${pStyle} ${rStyle}">${inline}</div>`;
+      return `<div ${prov} style="${textShapeStyle(el)}">${inline}</div>`;
     }
 
     if (el.geometry.type === 'div') {
