@@ -48,7 +48,7 @@ function compositeKey(ownerKind: string, ownerId: string, embedId: string): stri
 }
 
 export async function parsePptx(
-  buffer: Uint8Array,
+  buffer: Uint8Array | ArrayBuffer,
   options: ParseOptions = {},
 ): Promise<ParsedDeck> {
   // 1. collector (for bucketing warnings) composed with the user's logger (or noop).
@@ -74,7 +74,8 @@ export async function parsePptx(
       throw new Error('unused');
     },
   };
-  const raw = await parsePptxToRawIR(Buffer.from(buffer), ctx);
+  const bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
+  const raw = await parsePptxToRawIR(Buffer.from(bytes), ctx);
 
   // 3. semantic IR
   const semantic = transformToSemanticIR(raw, logger);
