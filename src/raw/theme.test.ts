@@ -5,7 +5,7 @@ import { parseTheme } from './theme';
 
 describe('parseTheme', () => {
   it('解析 12 色 clrScheme + fontScheme', () => {
-    const xml = readFileSync(path.join(__dirname, '../../../../../../tests/integration/fixtures/phase-a/minimal-theme.xml'), 'utf8');
+    const xml = readFileSync(path.join(__dirname, '../../tests/integration/fixtures/phase-a/minimal-theme.xml'), 'utf8');
     const theme = parseTheme('theme1', '/ppt/theme/theme1.xml', xml);
     expect(theme.clrScheme.dk1).toBe('#000000');  // sysClr 取 lastClr
     expect(theme.clrScheme.lt1).toBe('#FFFFFF');

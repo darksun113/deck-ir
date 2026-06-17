@@ -5,7 +5,7 @@ import { parseContentTypes } from './content-types';
 
 describe('parseContentTypes', () => {
   it('提取 master/layout/slide/theme 文件路径', () => {
-    const xml = readFileSync(path.join(__dirname, '../../../../../../tests/integration/fixtures/phase-a/minimal-content-types.xml'), 'utf8');
+    const xml = readFileSync(path.join(__dirname, '../../tests/integration/fixtures/phase-a/minimal-content-types.xml'), 'utf8');
     const result = parseContentTypes(xml);
     expect(result.masterParts).toContain('/ppt/slideMasters/slideMaster1.xml');
     expect(result.layoutParts).toContain('/ppt/slideLayouts/slideLayout1.xml');

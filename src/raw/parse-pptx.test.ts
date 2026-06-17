@@ -5,7 +5,7 @@ import JSZip from 'jszip';
 import { parsePptxToRawIR } from './parse-pptx';
 import { createNoopLogger } from '../logger/noop';
 
-const FIXTURE_DIR = path.join(__dirname, '../../../../../../tests/integration/fixtures/phase-a');
+const FIXTURE_DIR = path.join(__dirname, '../../tests/integration/fixtures/phase-a');
 function f(name: string) { return readFileSync(path.join(FIXTURE_DIR, name), 'utf8'); }
 
 async function buildMinimalPptxBuffer(): Promise<Buffer> {

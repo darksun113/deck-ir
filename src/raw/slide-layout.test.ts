@@ -5,8 +5,8 @@ import { parseSlideLayout } from './slide-layout';
 
 describe('parseSlideLayout', () => {
   it('解析 type + showMasterSp + masterRef', () => {
-    const xml = readFileSync(path.join(__dirname, '../../../../../../tests/integration/fixtures/phase-a/minimal-layout.xml'), 'utf8');
-    const rels = readFileSync(path.join(__dirname, '../../../../../../tests/integration/fixtures/phase-a/minimal-layout.xml.rels'), 'utf8');
+    const xml = readFileSync(path.join(__dirname, '../../tests/integration/fixtures/phase-a/minimal-layout.xml'), 'utf8');
+    const rels = readFileSync(path.join(__dirname, '../../tests/integration/fixtures/phase-a/minimal-layout.xml.rels'), 'utf8');
     const layout = parseSlideLayout('layout1', '/ppt/slideLayouts/slideLayout1.xml', xml, rels);
     expect(layout.type).toBe('title');
     expect(layout.showMasterSp).toBe(false);  // "0" → false

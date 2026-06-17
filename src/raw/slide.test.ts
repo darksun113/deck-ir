@@ -6,8 +6,8 @@ import { createCollectorLogger } from '../logger';
 
 describe('parseSlide', () => {
   it('解析 show + layoutRef', () => {
-    const xml = readFileSync(path.join(__dirname, '../../../../../../tests/integration/fixtures/phase-a/minimal-slide.xml'), 'utf8');
-    const rels = readFileSync(path.join(__dirname, '../../../../../../tests/integration/fixtures/phase-a/minimal-slide.xml.rels'), 'utf8');
+    const xml = readFileSync(path.join(__dirname, '../../tests/integration/fixtures/phase-a/minimal-slide.xml'), 'utf8');
+    const rels = readFileSync(path.join(__dirname, '../../tests/integration/fixtures/phase-a/minimal-slide.xml.rels'), 'utf8');
     const slide = parseSlide('slide1', '/ppt/slides/slide1.xml', xml, rels);
     expect(slide.show).toBe(true);
     expect(slide.layoutRef).toBe('layout1');
