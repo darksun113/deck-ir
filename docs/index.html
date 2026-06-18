@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>deck-ir — render PowerPoint .pptx to HTML, in pure JS</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%232f7bff'/%3E%3Ctext x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3Ed%3C/text%3E%3C/svg%3E">
+<meta name="description" content="Drop a .pptx and watch it render to HTML in your browser — no PowerPoint, no LibreOffice, no server. Powered by deck-ir.">
+<style>
+  :root { --blue:#2f7bff; --ink:#1a1a2e; --mut:#6b6b80; --line:#e6e6ee; --bg:#f6f7fb; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:-apple-system,"Segoe UI","PingFang SC",sans-serif; color:var(--ink); background:var(--bg); }
+  header { text-align:center; padding:40px 20px 20px; }
+  header h1 { margin:0; font-size:34px; letter-spacing:-.5px; }
+  header h1 .vlm { color:var(--blue); }
+  header p { margin:10px auto 0; max-width:620px; color:var(--mut); font-size:15px; line-height:1.5; }
+  .links { margin-top:16px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+  .links a { font-size:13px; text-decoration:none; color:var(--ink); border:1px solid var(--line); background:#fff; padding:7px 14px; border-radius:8px; }
+  .links a.primary { background:var(--blue); color:#fff; border-color:var(--blue); }
+  main { max-width:880px; margin:0 auto; padding:10px 20px 60px; }
+  #drop { border:2px dashed #c4c9d6; border-radius:14px; background:#fff; padding:46px 20px; text-align:center; cursor:pointer; transition:.15s; }
+  #drop.hover { border-color:var(--blue); background:#f0f5ff; }
+  #drop strong { font-size:17px; } #drop span { display:block; color:var(--mut); font-size:13px; margin-top:6px; }
+  #bar { display:none; align-items:center; gap:14px; margin:20px 0 6px; flex-wrap:wrap; }
+  #bar .meta { font-size:14px; color:var(--mut); }
+  #bar button { font-size:13px; border:1px solid var(--line); background:#fff; padding:7px 12px; border-radius:8px; cursor:pointer; }
+  #err { display:none; color:#c0392b; background:#fdecea; border:1px solid #f5c6c2; padding:12px 14px; border-radius:10px; margin-top:16px; font-size:13px; white-space:pre-wrap; }
+  .slide-wrap { margin:18px 0; box-shadow:0 3px 16px rgba(0,0,0,.12); border-radius:6px; overflow:hidden; background:#fff; }
+  .slide-host { transform-origin:top left; }
+  pre.src { display:none; background:#1e1e2e; color:#cdd6f4; padding:14px 16px; border-radius:10px; overflow:auto; font-size:11.5px; line-height:1.5; max-height:340px; }
+  footer { text-align:center; color:var(--mut); font-size:13px; padding:30px 20px 50px; border-top:1px solid var(--line); }
+  footer a { color:var(--blue); text-decoration:none; }
+  .spin { display:inline-block; width:15px; height:15px; border:2px solid #cfd6e6; border-top-color:var(--blue); border-radius:50%; animation:r .7s linear infinite; vertical-align:-2px; }
+  @keyframes r { to { transform:rotate(360deg); } }
+</style>
+</head>
+<body>
+<header>
+  <h1>deck-ir</h1>
+  <p>Render a PowerPoint <code>.pptx</code> to HTML — <strong>in pure JavaScript, right here in your browser.</strong> No PowerPoint, no LibreOffice, no server. Drop a file below; it never leaves your machine.</p>
+  <div class="links">
+    <a class="primary" href="https://github.com/darksun113/deck-ir">GitHub ★</a>
+    <a href="https://www.npmjs.com/package/deck-ir">npm</a>
+    <a href="https://flashdeck.cn">Full product → flashdeck.cn</a>
+  </div>
+</header>
+
+<main>
+  <div id="drop">
+    <strong>Drop a .pptx here</strong>
+    <span>or click to choose · everything runs locally in your browser</span>
+    <input id="file" type="file" accept=".pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation" hidden>
+  </div>
+
+  <div id="bar">
+    <span class="meta" id="meta"></span>
+    <button id="toggle">Show HTML source</button>
+    <button id="dl">Download .html</button>
+  </div>
+
+  <div id="err"></div>
+  <pre class="src" id="src"></pre>
+  <div id="out"></div>
+</main>
+
+<footer>
+  Powered by <a href="https://github.com/darksun113/deck-ir">deck-ir</a> · AGPL-3.0 + commercial ·
+  Want AI one-line→full PPT, an editor, and PPTX export? → <a href="https://flashdeck.cn">flashdeck.cn</a>
+</footer>
+
+<script type="module">
+  // deck-ir uses Node's Buffer internally; provide it in the browser before loading the lib.
+  import { Buffer } from "https://esm.sh/buffer@6.0.3";
+  globalThis.Buffer ||= Buffer;
+  const { parsePptx, DECK_IR_VERSION } = await import("https://esm.sh/deck-ir@0.1.0");
+
+  const $ = (id) => document.getElementById(id);
+  const drop = $("drop"), file = $("file"), out = $("out"), bar = $("bar"), meta = $("meta"),
+        err = $("err"), src = $("src"), toggle = $("toggle"), dl = $("dl");
+  let lastDoc = "";
+
+  drop.onclick = () => file.click();
+  ["dragenter","dragover"].forEach(e => drop.addEventListener(e, ev => { ev.preventDefault(); drop.classList.add("hover"); }));
+  ["dragleave","drop"].forEach(e => drop.addEventListener(e, ev => { ev.preventDefault(); drop.classList.remove("hover"); }));
+  drop.addEventListener("drop", ev => { const f = ev.dataTransfer.files[0]; if (f) render(f); });
+  file.addEventListener("change", () => { if (file.files[0]) render(file.files[0]); });
+
+  toggle.onclick = () => {
+    const showing = src.style.display === "block";
+    src.style.display = showing ? "none" : "block";
+    toggle.textContent = showing ? "Show HTML source" : "Hide HTML source";
+  };
+  dl.onclick = () => {
+    const blob = new Blob([lastDoc], { type: "text/html" });
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "deck.html"; a.click();
+  };
+
+  async function render(f) {
+    err.style.display = "none"; out.innerHTML = ""; src.style.display = "none";
+    toggle.textContent = "Show HTML source";
+    drop.querySelector("strong").innerHTML = `<span class="spin"></span> Parsing ${f.name}…`;
+    try {
+      const buf = new Uint8Array(await f.arrayBuffer());
+      const { slideSize, slides } = await parsePptx(buf);
+      const dispW = Math.min(760, slideSize.w);
+      const scale = dispW / slideSize.w;
+      for (const s of slides) {
+        const wrap = document.createElement("div");
+        wrap.className = "slide-wrap";
+        wrap.style.width = dispW + "px";
+        wrap.style.height = slideSize.h * scale + "px";
+        const host = document.createElement("div");
+        host.className = "slide-host";
+        host.style.transform = `scale(${scale})`;
+        host.style.width = slideSize.w + "px";
+        host.style.height = slideSize.h + "px";
+        host.innerHTML = s.html;
+        wrap.appendChild(host); out.appendChild(wrap);
+      }
+      lastDoc = `<!doctype html><meta charset="utf-8"><body style="margin:0;background:#eee;display:flex;flex-direction:column;align-items:center;gap:16px;padding:16px">`
+        + slides.map(s => s.html).join("\n") + `</body>`;
+      src.textContent = slides.map(s => s.html).join("\n\n");
+      meta.innerHTML = `<strong>${slides.length}</strong> slides · ${slideSize.w}×${slideSize.h}px · deck-ir v${DECK_IR_VERSION}`;
+      bar.style.display = "flex";
+      drop.querySelector("strong").textContent = "Drop another .pptx";
+    } catch (e) {
+      err.textContent = "Failed to parse: " + (e && e.message ? e.message : e);
+      err.style.display = "block";
+      drop.querySelector("strong").textContent = "Drop a .pptx here";
+      console.error(e);
+    }
+  }
+
+  window.__deckirReady = true;
+</script>
+</body>
+</html>

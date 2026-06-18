@@ -6,6 +6,8 @@
 [![license](https://img.shields.io/badge/license-AGPL--3.0-blue.svg)](./LICENSE)
 [![CI](https://img.shields.io/badge/CI-passing-brightgreen.svg)](./.github/workflows/ci.yml)
 
+**▶ [Live demo](https://darksun113.github.io/deck-ir/)** — drop a `.pptx` and watch it render to HTML right in your browser (nothing is uploaded; it all runs client-side).
+
 `deck-ir` is a deterministic rendering core that turns a `.pptx` buffer into one faithful HTML fragment per slide. It is the open-source rendering engine extracted from [flash-deck](https://flashdeck.cn)'s PPTX→HTML pipeline.
 
 ## What it is
