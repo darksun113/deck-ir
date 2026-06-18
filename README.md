@@ -8,6 +8,8 @@
 
 **▶ [Live demo](https://darksun113.github.io/deck-ir/)** — drop a `.pptx` and watch it render to HTML right in your browser (nothing is uploaded; it all runs client-side).
 
+[![deck-ir: drop a .pptx, render to HTML in the browser](https://raw.githubusercontent.com/darksun113/deck-ir/main/docs/demo.gif)](https://darksun113.github.io/deck-ir/)
+
 `deck-ir` is a deterministic rendering core that turns a `.pptx` buffer into one faithful HTML fragment per slide. It is the open-source rendering engine extracted from [flash-deck](https://flashdeck.cn)'s PPTX→HTML pipeline.
 
 ## What it is

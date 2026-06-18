@@ -52,6 +52,10 @@
     <input id="file" type="file" accept=".pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation" hidden>
   </div>
 
+  <div style="text-align:center;margin-top:12px;font-size:13.5px">
+    <a href="#" id="example" style="color:#2f7bff;text-decoration:none">▶ or try an example deck</a>
+  </div>
+
   <div id="bar">
     <span class="meta" id="meta"></span>
     <button id="toggle">Show HTML source</button>
@@ -84,6 +88,7 @@
   ["dragleave","drop"].forEach(e => drop.addEventListener(e, ev => { ev.preventDefault(); drop.classList.remove("hover"); }));
   drop.addEventListener("drop", ev => { const f = ev.dataTransfer.files[0]; if (f) render(f); });
   file.addEventListener("change", () => { if (file.files[0]) render(file.files[0]); });
+  $("example").onclick = (e) => { e.preventDefault(); loadExample(); };
 
   toggle.onclick = () => {
     const showing = src.style.display === "block";
@@ -95,12 +100,24 @@
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "deck.html"; a.click();
   };
 
-  async function render(f) {
+  function setBusy(label) {
     err.style.display = "none"; out.innerHTML = ""; src.style.display = "none";
     toggle.textContent = "Show HTML source";
-    drop.querySelector("strong").innerHTML = `<span class="spin"></span> Parsing ${f.name}…`;
+    drop.querySelector("strong").innerHTML = `<span class="spin"></span> ${label}`;
+  }
+  async function render(f) { setBusy(`Parsing ${f.name}…`); await renderBuffer(new Uint8Array(await f.arrayBuffer())); }
+  async function loadExample() {
+    setBusy("Loading example deck…");
     try {
-      const buf = new Uint8Array(await f.arrayBuffer());
+      const r = await fetch("./sample.pptx");
+      await renderBuffer(new Uint8Array(await r.arrayBuffer()));
+    } catch (e) {
+      err.textContent = "Failed to load example: " + (e && e.message ? e.message : e);
+      err.style.display = "block"; drop.querySelector("strong").textContent = "Drop a .pptx here";
+    }
+  }
+  async function renderBuffer(buf) {
+    try {
       const { slideSize, slides } = await parsePptx(buf);
       const dispW = Math.min(760, slideSize.w);
       const scale = dispW / slideSize.w;
